@@ -723,7 +723,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
