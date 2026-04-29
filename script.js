@@ -4,6 +4,12 @@ const VIDKING = 'https://www.vidking.net/embed';
 const VIDKING_ORIGIN = 'https://www.vidking.net';
 const VIDEASY = 'https://player.videasy.net';
 let playerSource = localStorage.getItem('vk_player') || 'videasy';
+const DEFAULT_AUDIO_SETTINGS = { enabled: false, spatial: false, volume: 0.45, width: 0.6, depth: 0.45 };
+let audioSettings = (() => {
+    try { return { ...DEFAULT_AUDIO_SETTINGS, ...(JSON.parse(localStorage.getItem('vk_audio_settings') || '{}')) }; }
+    catch (_) { return { ...DEFAULT_AUDIO_SETTINGS }; }
+})();
+let audioEngine = null;
 
 const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
 const API_KEY = IS_LOCAL ? '85134f05e0f15fe779e23cd56c1a08d5' : null;
@@ -14,6 +20,43 @@ function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+function saveAudioSettings() {
+    localStorage.setItem('vk_audio_settings', JSON.stringify(audioSettings));
+}
+
+function createAudioEngine() {
+    if (audioEngine || typeof Howl === 'undefined') return;
+    audioEngine = {
+        move: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0e5f8c8.mp3?filename=click-124467.mp3'], volume: 0.2 }),
+        open: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/10/audio_e17e4f0f6f.mp3?filename=video-game-bonus-2064.mp3'], volume: 0.18 }),
+        close: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_96b478f3a0.mp3?filename=interface-124464.mp3'], volume: 0.18 }),
+        hum: new Howl({
+            src: ['https://cdn.pixabay.com/download/audio/2021/11/25/audio_5b5a53470b.mp3?filename=atmospheric-ambient-10618.mp3'],
+            loop: true, html5: true, volume: 0
+        })
+    };
+}
+
+function updateAudioLabel() {
+    const el = document.getElementById('audio-settings-text');
+    if (el) el.textContent = `Âm thanh chân thật: ${audioSettings.enabled ? 'Bật' : 'Tắt'}`;
+}
+
+function applyAudioScene() {
+    if (!audioEngine) return;
+    const targetVolume = audioSettings.enabled ? (audioSettings.volume * 0.7) : 0;
+    audioEngine.hum.fade(audioEngine.hum.volume(), targetVolume, 280);
+    if (audioSettings.enabled && !audioEngine.hum.playing()) audioEngine.hum.play();
+}
+
+function playUiSound(kind, pan = 0) {
+    if (!audioSettings.enabled || !audioEngine || !audioEngine[kind]) return;
+    const snd = audioEngine[kind];
+    const id = snd.play();
+    snd.volume(Math.max(0, Math.min(1, audioSettings.volume)), id);
+    if (audioSettings.spatial && typeof snd.stereo === 'function') snd.stereo(Math.max(-1, Math.min(1, pan)), id);
 }
 
 const ROWS = [
@@ -627,6 +670,8 @@ function playContent(item, season, episode) {
 
     document.getElementById('player-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    playUiSound('open', 0.35);
+    applyAudioScene();
 }
 
 function destroyPlayerFrame() {
@@ -645,6 +690,7 @@ function closePlayer() {
     destroyPlayerFrame();
     document.getElementById('player-overlay').classList.remove('active');
     document.body.style.overflow = '';
+    applyAudioScene();
     buildContinueRow();
 }
 
@@ -874,6 +920,8 @@ function makeInteractive(el) {
 }
 
 function wireListeners() {
+    createAudioEngine();
+    updateAudioLabel();
     function setVh() {
         const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
         document.documentElement.style.setProperty('--vh', vh + 'px');
@@ -895,15 +943,15 @@ function wireListeners() {
     }, { passive: true });
 
     document.querySelectorAll('.nav-link').forEach(el => {
-        el.onclick = () => navTo(el.dataset.page);
+        el.onclick = () => { playUiSound('move', -0.25); navTo(el.dataset.page); };
         makeInteractive(el);
     });
     document.querySelectorAll('.mobile-dropdown-item').forEach(el => {
-        el.onclick = () => navTo(el.dataset.page);
+        el.onclick = () => { playUiSound('move', 0.1); navTo(el.dataset.page); };
         makeInteractive(el);
     });
     document.querySelectorAll('.bottom-nav-item').forEach(el => {
-        el.onclick = () => navTo(el.dataset.page);
+        el.onclick = () => { playUiSound('move', 0.2); navTo(el.dataset.page); };
         makeInteractive(el);
     });
     const logoBtn = document.getElementById('logo-btn');
@@ -965,7 +1013,7 @@ function wireListeners() {
     document.getElementById('detail-close-btn').onclick = closeDetail;
     document.getElementById('detail-overlay').onclick = e => { if (e.target === e.currentTarget) closeDetail(); };
 
-    document.getElementById('player-back-btn').onclick = closePlayer;
+    document.getElementById('player-back-btn').onclick = () => { playUiSound('close', -0.4); closePlayer(); };
 
     document.onkeydown = e => {
         if (e.key !== 'Escape') return;
@@ -1106,6 +1154,49 @@ function wireSettingsActions() {
             showToast(`Đã chuyển trình phát sang ${playerSource === 'vidking' ? 'VidKing' : 'VidEasy'}`);
         };
     }
+
+    const audioPanelBtn = document.getElementById('settings-audio-panel');
+    if (audioPanelBtn) {
+        audioPanelBtn.onclick = e => {
+            e.stopPropagation();
+            const panel = document.getElementById('audio-panel');
+            document.getElementById('player-overlay').classList.add('active');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+    }
+
+    const enabledEl = document.getElementById('audio-enabled');
+    const spatialEl = document.getElementById('audio-spatial');
+    const volEl = document.getElementById('audio-volume');
+    const widthEl = document.getElementById('audio-width');
+    const depthEl = document.getElementById('audio-depth');
+    enabledEl.checked = !!audioSettings.enabled;
+    spatialEl.checked = !!audioSettings.spatial;
+    volEl.value = Math.round(audioSettings.volume * 100);
+    widthEl.value = Math.round(audioSettings.width * 100);
+    depthEl.value = Math.round(audioSettings.depth * 100);
+
+    const syncAudioState = () => {
+        audioSettings.enabled = enabledEl.checked;
+        audioSettings.spatial = spatialEl.checked;
+        audioSettings.volume = Number(volEl.value) / 100;
+        audioSettings.width = Number(widthEl.value) / 100;
+        audioSettings.depth = Number(depthEl.value) / 100;
+        saveAudioSettings();
+        updateAudioLabel();
+        applyAudioScene();
+        playUiSound('move', (audioSettings.width * 2) - 1);
+    };
+
+    [enabledEl, spatialEl].forEach(el => el.addEventListener('change', syncAudioState));
+    [volEl, widthEl, depthEl].forEach(el => el.addEventListener('input', syncAudioState));
+
+    window.addEventListener('pointermove', (e) => {
+        if (!audioSettings.enabled || !audioSettings.spatial || !audioEngine || !audioEngine.hum.playing()) return;
+        const xNorm = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+        const pan = xNorm * audioSettings.width;
+        try { audioEngine.hum.stereo(Math.max(-1, Math.min(1, pan))); } catch (_) { }
+    }, { passive: true });
 }
 
 let syncTimerInterval = null;

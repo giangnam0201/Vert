@@ -2741,3 +2741,25 @@ footer {
         margin: -10px 0;
     }
 }
+.audio-panel {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 20;
+    width: min(320px, calc(100% - 40px));
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(8, 8, 8, 0.72);
+    border: 1px solid rgba(255,255,255,.1);
+    backdrop-filter: blur(10px);
+    display: grid;
+    gap: 8px;
+    font-size: .82rem;
+}
+.audio-panel-title { font-weight: 700; color: #fff; margin-bottom: 3px; }
+.audio-panel label { display: grid; gap: 6px; color: #d0d0d0; }
+.audio-panel input[type="range"] { width: 100%; accent-color: #d1477a; }
+.audio-panel input[type="checkbox"] { margin-right: 8px; accent-color: #d1477a; }
+@media (max-width: 900px) {
+    .audio-panel { position: static; margin: 12px auto 0; }
+}
