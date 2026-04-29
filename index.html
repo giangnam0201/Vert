@@ -143,6 +143,15 @@
                         </svg>
                         <span id="player-source-text">Trình phát: VidEasy</span>
                     </button>
+                    <button class="account-item" id="settings-audio-panel">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
+                            <path d="M11 5 6 9H3v6h3l5 4V5z"></path>
+                            <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                            <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+                        </svg>
+                        <span id="audio-settings-text">Âm thanh chân thật: Tắt</span>
+                    </button>
                     <div class="account-divider"></div>
                     <button class="account-item" id="settings-about">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -337,6 +346,14 @@
         <div class="player-frame-wrap">
             <div id="player-frame"></div>
         </div>
+        <div class="audio-panel" id="audio-panel">
+            <div class="audio-panel-title">Âm thanh Immersive</div>
+            <label><input type="checkbox" id="audio-enabled"> Bật hiệu ứng âm thanh chân thật</label>
+            <label><input type="checkbox" id="audio-spatial"> Bật spatial audio</label>
+            <label>Âm lượng hiệu ứng <input type="range" id="audio-volume" min="0" max="100" value="45"></label>
+            <label>Độ rộng không gian <input type="range" id="audio-width" min="0" max="100" value="60"></label>
+            <label>Độ sâu ambience <input type="range" id="audio-depth" min="0" max="100" value="45"></label>
+        </div>
     </div>
 
     <div class="sync-overlay" id="sync-overlay">
@@ -396,6 +413,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
     <script src="script.js"></script>
 </body>
 
