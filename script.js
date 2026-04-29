@@ -668,7 +668,9 @@ function playContent(item, season, episode) {
         frame.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
-    document.getElementById('player-overlay').classList.add('active');
+    const playerOverlay = document.getElementById('player-overlay');
+    playerOverlay.classList.remove('show-audio-panel');
+    playerOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     playUiSound('open', 0.35);
     applyAudioScene();
@@ -688,7 +690,8 @@ function destroyPlayerFrame() {
 function closePlayer() {
     ignoreProgress = true;
     destroyPlayerFrame();
-    document.getElementById('player-overlay').classList.remove('active');
+    const playerOverlay = document.getElementById('player-overlay');
+    playerOverlay.classList.remove('active', 'show-audio-panel');
     document.body.style.overflow = '';
     applyAudioScene();
     buildContinueRow();
@@ -1160,7 +1163,8 @@ function wireSettingsActions() {
         audioPanelBtn.onclick = e => {
             e.stopPropagation();
             const panel = document.getElementById('audio-panel');
-            document.getElementById('player-overlay').classList.add('active');
+            const playerOverlay = document.getElementById('player-overlay');
+            playerOverlay.classList.add('active', 'show-audio-panel');
             panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         };
     }

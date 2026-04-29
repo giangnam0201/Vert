@@ -2752,9 +2752,12 @@ footer {
     background: rgba(8, 8, 8, 0.72);
     border: 1px solid rgba(255,255,255,.1);
     backdrop-filter: blur(10px);
-    display: grid;
+    display: none;
     gap: 8px;
     font-size: .82rem;
+}
+.player-overlay.show-audio-panel .audio-panel {
+    display: grid;
 }
 .audio-panel-title { font-weight: 700; color: #fff; margin-bottom: 3px; }
 .audio-panel label { display: grid; gap: 6px; color: #d0d0d0; }
