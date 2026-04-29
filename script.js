@@ -59,6 +59,63 @@ function playUiSound(kind, pan = 0) {
     if (audioSettings.spatial && typeof snd.stereo === 'function') snd.stereo(Math.max(-1, Math.min(1, pan)), id);
 }
 
+
+const TRUSTED_NAV_HOSTS = new Set([location.hostname, 'www.themoviedb.org', 'themoviedb.org']);
+
+function isLikelyAdUrl(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== 'string') return false;
+    let url;
+    try { url = new URL(rawUrl, location.href); } catch (_) { return false; }
+    const host = url.hostname.toLowerCase();
+    const pathAndQuery = `${url.pathname}${url.search}`.toLowerCase();
+    if (host === location.hostname) return false;
+    const noisyHost = /(adservice|doubleclick|popads|propellerads|adsterra|trafficjunky|exoclick|hilltopads|taboola|outbrain|adnxs|mgid|popcash)/.test(host);
+    const noisyPath = /(ad[sx]?|popunder|redirect|clickid|utm_source=ad|gclid=|fbclid=|zoneid=|campaignid=)/.test(pathAndQuery);
+    return noisyHost || noisyPath;
+}
+
+function installAdHooks() {
+    if (window.__vertAdHooksInstalled) return;
+    window.__vertAdHooksInstalled = true;
+
+    const nativeOpen = window.open;
+    window.open = function hookedWindowOpen(url, target, features) {
+        const blocked = isLikelyAdUrl(url) && target === '_blank';
+        if (blocked) {
+            showToast('Đã chặn cửa sổ quảng cáo nghi ngờ');
+            return null;
+        }
+        return nativeOpen.call(window, url, target, features);
+    };
+
+    document.addEventListener('click', (event) => {
+        const anchor = event.target.closest && event.target.closest('a[href]');
+        if (!anchor) return;
+        const href = anchor.getAttribute('href') || '';
+        if (href.startsWith('#')) return;
+        const opensNewTab = anchor.target === '_blank' || anchor.rel.includes('noopener');
+        if (!opensNewTab) return;
+        if (isLikelyAdUrl(href)) {
+            event.preventDefault();
+            event.stopPropagation();
+            showToast('Đã chặn liên kết quảng cáo nghi ngờ');
+        }
+    }, true);
+
+    let lastSafePath = `${location.pathname}${location.search}${location.hash}`;
+    setInterval(() => {
+        const currentPath = `${location.pathname}${location.search}${location.hash}`;
+        if (currentPath !== lastSafePath) {
+            const outsideTrusted = !TRUSTED_NAV_HOSTS.has(location.hostname);
+            if (outsideTrusted || isLikelyAdUrl(location.href)) {
+                history.replaceState(null, '', lastSafePath);
+                showToast('Đã chặn chuyển hướng nghi ngờ');
+                return;
+            }
+            lastSafePath = currentPath;
+        }
+    }, 900);
+}
 const ROWS = [
     { id: 'trending', title: 'Xu hướng hiện nay', endpoint: '/trending/all/week', mediaType: 'all', badge: 'top10' },
     { id: 'popular-m', title: 'Phổ biến trên Vert', endpoint: '/movie/popular', mediaType: 'movie' },
@@ -186,6 +243,7 @@ function genreNames(ids) { return (ids || []).map(i => GENRE_MAP[i]).filter(Bool
 
 document.addEventListener('DOMContentLoaded', async () => {
     wireListeners();
+    installAdHooks();
     const hash = window.location.hash.slice(1);
     if (['movies', 'tv', 'mylist'].includes(hash)) {
         currentPage = hash;
@@ -665,7 +723,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
