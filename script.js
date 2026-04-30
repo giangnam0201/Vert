@@ -707,13 +707,13 @@ function playContent(item, season, episode) {
         if (isVidking) {
             url = `${VIDKING}/tv/${item.id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
         } else {
-            url = `${VIDEASY}/tv?tmdb=${item.id}&season=${s}&episode=${e}`;
+            url = `https://vidlink.pro/tv/${item.id}/${s}/${e}?primaryColor=E50914&autoplay=false`;
         }
     } else {
         if (isVidking) {
             url = `${VIDKING}/movie/${item.id}?color=e50914&autoPlay=true`;
         } else {
-            url = `${VIDEASY}/movie?tmdb=${item.id}`;
+            url = `https://vidlink.pro/movie/${item.id}?primaryColor=E50914&autoplay=false`;
         }
     }
 
@@ -723,7 +723,8 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        const sandboxAttr = isVidking ? '' : `sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"`;
+        frame.innerHTML = `<iframe src="${url}" ${sandboxAttr} referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
