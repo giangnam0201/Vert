@@ -63,6 +63,8 @@ jobs:
         run: |
           cat << 'EOF' > android/app/src/main/java/com/vert/app/MainActivity.java
           package com.vert.app;
+          import android.content.Intent;
+          import android.net.Uri;
           import android.os.Bundle;
           import android.webkit.WebView;
           import com.getcapacitor.BridgeActivity;
@@ -77,6 +79,16 @@ jobs:
                   WebView webView = this.bridge.getWebView();
                   webView.getSettings().setSupportMultipleWindows(false);
                   webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+              }
+              @Override
+              public void startActivity(Intent intent) {
+                  if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+                      Uri uri = intent.getData();
+                      if (uri != null && (uri.getScheme().equals("http") || uri.getScheme().equals("https"))) {
+                          return;
+                      }
+                  }
+                  super.startActivity(intent);
               }
           }
           EOF
