@@ -1,6 +1,5 @@
 {
   "appId": "com.vert.app",
   "appName": "Vert",
-  "webDir": ".",
-  "bundledWebRuntime": false
+  "webDir": "www"
 }

@@ -39,6 +39,10 @@ jobs:
           java-version: '17'
       - name: Install dependencies
         run: npm install
+      - name: Prepare Web Assets
+        run: |
+          mkdir www
+          cp -r index.html style.css script.js manifest.json api www/ 2>/dev/null || true
       - name: Add Android Platform
         run: npx cap add android
       - name: Build Android APK

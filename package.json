@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-builder --win",
+    "build:win": "electron-builder --win -p never",
     "build:android": "cap sync android && cd android && gradlew assembleDebug"
   },
   "build": {
