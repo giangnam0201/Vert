@@ -47,14 +47,14 @@ button {
 
 
 :focus-visible {
-    outline: 2px solid rgba(209, 71, 122, .8);
+    outline: 2px solid rgba(229, 9, 20, .8);
     outline-offset: 2px;
 }
 
 button:focus-visible,
 .card-circle:focus-visible,
 .circle-action:focus-visible {
-    outline: 2px solid rgba(209, 71, 122, .8);
+    outline: 2px solid rgba(229, 9, 20, .8);
     outline-offset: 2px;
 }
 
@@ -84,7 +84,7 @@ img {
 }
 
 ::selection {
-    background: #d1477a;
+    background: #E50914;
     color: #fff;
 }
 
@@ -113,17 +113,17 @@ img {
     font-size: 2.8rem;
     font-weight: 900;
     letter-spacing: 4px;
-    color: #d1477a;
+    color: #E50914;
     margin-bottom: 24px;
 }
 
 .loader-logo span {
     display: inline-block;
     color: transparent;
-    background: linear-gradient(90deg, #e86b9e, #d1477a);
+    background: linear-gradient(90deg, #ff3333, #E50914);
     -webkit-background-clip: text;
     background-clip: text;
-    filter: drop-shadow(0 0 10px rgba(209, 71, 122, 0.8));
+    filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.8));
     animation: bounce-letter .6s ease infinite alternate;
 }
 
@@ -149,7 +149,7 @@ img {
 .loader-bar-fill {
     width: 30%;
     height: 100%;
-    background: #d1477a;
+    background: #E50914;
     border-radius: 2px;
     animation: loader-slide 1.2s ease-in-out infinite;
 }
@@ -204,18 +204,18 @@ img {
     font-size: 1.5rem;
     font-weight: 900;
     color: transparent;
-    background: linear-gradient(90deg, #e86b9e, #d1477a);
+    background: linear-gradient(90deg, #ff3333, #E50914);
     -webkit-background-clip: text;
     background-clip: text;
     letter-spacing: 3px;
     cursor: pointer;
     user-select: none;
     transition: filter .3s, transform .3s;
-    filter: drop-shadow(0 0 8px rgba(209, 71, 122, 0.4));
+    filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.4));
 }
 
 .logo:hover {
-    filter: drop-shadow(0 0 16px rgba(209, 71, 122, 0.8));
+    filter: drop-shadow(0 0 16px rgba(229, 9, 20, 0.8));
     transform: scale(1.02);
 }
 
@@ -265,7 +265,7 @@ img {
     transform: translateX(-50%);
     width: 14px;
     height: 2px;
-    background: #d1477a;
+    background: #E50914;
     border-radius: 1px;
 }
 
@@ -350,7 +350,7 @@ img {
 
 .filter-item.active {
     color: #fff;
-    background: #d1477a;
+    background: #E50914;
 }
 
 .mobile-menu-btn {
@@ -538,7 +538,7 @@ img {
 }
 
 .suggest-meta .sug-type {
-    color: #d1477a;
+    color: #E50914;
     font-weight: 600;
     text-transform: uppercase;
     font-size: .65rem;
@@ -699,11 +699,11 @@ img {
 }
 
 .account-item.confirm {
-    color: #d1477a;
+    color: #E50914;
 }
 
 .account-item.confirm svg {
-    stroke: #d1477a;
+    stroke: #E50914;
     opacity: 1;
 }
 
@@ -849,8 +849,8 @@ img {
 }
 
 .sync-tab.active {
-    background: rgba(209, 71, 122, .15);
-    color: #d1477a;
+    background: rgba(229, 9, 20, .15);
+    color: #E50914;
 }
 
 .sync-tab:hover:not(.active) {
@@ -908,7 +908,7 @@ img {
 
 .sync-pin-timer {
     font-size: .72rem;
-    color: #d1477a;
+    color: #E50914;
     text-align: center;
     margin-top: 4px;
     min-height: 16px;
@@ -946,7 +946,7 @@ img {
 }
 
 .sync-code-input:focus {
-    border-color: rgba(209, 71, 122, .6);
+    border-color: rgba(229, 9, 20, .6);
 }
 
 .sync-code-input::placeholder {
@@ -977,7 +977,7 @@ img {
 }
 
 .sync-btn-primary {
-    background: #d1477a;
+    background: #E50914;
     color: #fff;
 }
 
@@ -1017,7 +1017,7 @@ img {
 }
 
 .sync-status.error {
-    color: #d1477a;
+    color: #E50914;
 }
 
 .sync-status.info {
@@ -1063,7 +1063,7 @@ img {
 }
 
 .bottom-nav-item.active {
-    color: #d1477a;
+    color: #E50914;
 }
 
 .bottom-nav-item svg {
@@ -1074,7 +1074,7 @@ img {
 
 .bottom-nav-item.active svg {
     transform: translateY(-2px);
-    stroke: #d1477a;
+    stroke: #E50914;
 }
 
 .mobile-dropdown {
@@ -1186,7 +1186,7 @@ img {
 }
 
 .hero-content-type svg {
-    color: #d1477a;
+    color: #E50914;
 }
 
 .hero-title {
@@ -1453,7 +1453,7 @@ img {
 .card:hover,
 .card:focus-visible {
     transform: scale(1.25) translateY(-2%);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(209, 71, 122, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(229, 9, 20, 0.15);
     z-index: 30;
     border-color: rgba(255, 255, 255, 0.15);
     transition: transform .4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -1579,7 +1579,7 @@ img {
 
 .card-progress-fill {
     height: 100%;
-    background: #d1477a;
+    background: #E50914;
     border-radius: 0 2px 0 0;
 }
 
@@ -1589,7 +1589,7 @@ img {
     top: 6px;
     left: 6px;
     z-index: 4;
-    background: #d1477a;
+    background: #E50914;
     color: #fff;
     font-size: .55rem;
     font-weight: 800;
@@ -2265,7 +2265,7 @@ footer {
     height: 32px;
     border: 3px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    border-top-color: #d1477a;
+    border-top-color: #E50914;
     animation: spin 0.8s linear infinite;
 }
 
@@ -2761,8 +2761,124 @@ footer {
 }
 .audio-panel-title { font-weight: 700; color: #fff; margin-bottom: 3px; }
 .audio-panel label { display: grid; gap: 6px; color: #d0d0d0; }
-.audio-panel input[type="range"] { width: 100%; accent-color: #d1477a; }
-.audio-panel input[type="checkbox"] { margin-right: 8px; accent-color: #d1477a; }
+.audio-panel input[type="range"] { width: 100%; accent-color: #E50914; }
+.audio-panel input[type="checkbox"] { margin-right: 8px; accent-color: #E50914; }
 @media (max-width: 900px) {
     .audio-panel { position: static; margin: 12px auto 0; }
+}
+
+/* =========================================
+   NETFLIX ANIMATIONS & ELECTRON TITLEBAR
+   ========================================= */
+
+/* Titlebar for Windows/Electron */
+#electron-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: transparent;
+    z-index: 9999;
+    display: none; /* Only show in Electron */
+}
+
+.is-electron #electron-titlebar {
+    display: flex;
+}
+
+.is-electron #navbar {
+    top: 32px; /* Push navbar down when titlebar is active */
+}
+
+.drag-region {
+    flex: 1;
+    -webkit-app-region: drag;
+    height: 100%;
+}
+
+.window-controls {
+    display: flex;
+    -webkit-app-region: no-drag;
+}
+
+.window-controls button {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: transparent;
+    border: none;
+    outline: none;
+    transition: background 0.2s;
+}
+
+.window-controls button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#close-btn:hover {
+    background: #E50914 !important;
+}
+
+/* Netflix Animations Polish */
+/* Hover expansion delay for cards so quick swiping doesn't cause chaotic jumping */
+.card {
+    transition: transform .4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s,
+                box-shadow .4s ease 0.1s,
+                border-color .4s ease 0.1s,
+                z-index 0s 0.1s;
+}
+.card:hover, .card:focus-visible {
+    transform: scale(1.15) translateY(-2%);
+    z-index: 50;
+    transition-delay: 0.3s; /* Netflix delay to prevent accidental hovers */
+}
+.card:hover .card-panel {
+    transition-delay: 0.3s;
+}
+
+/* Modal Popup Netflix Style */
+.detail-modal {
+    transform: scale(0.9) translateY(40px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+    background-color: #141414;
+}
+.detail-overlay.active .detail-modal {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Hero Zoom animation on load */
+@keyframes heroZoomIn {
+    0% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+#hero {
+    animation: heroZoomIn 2s ease-out forwards;
+}
+
+/* Navbar smooth scroll effect */
+#navbar {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    transition: background-color 0.4s ease;
+}
+#navbar.solid {
+    background-color: #141414;
+    background-image: none;
+}
+
+/* Loader Animation */
+.loader-bar-fill {
+    background: #E50914;
+}
+.loader-logo span {
+    background: #E50914;
+    -webkit-background-clip: text;
+    background-clip: text;
 }
