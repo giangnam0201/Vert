@@ -50,10 +50,6 @@
     "security": {
       "csp": null
     },
-    "systemTray": {
-      "iconPath": "",
-      "iconAsTemplate": true
-    },
     "updater": {
       "active": false
     },
