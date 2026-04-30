@@ -11,7 +11,7 @@ let audioSettings = (() => {
 })();
 let audioEngine = null;
 
-const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'tauri.localhost' || location.protocol === 'file:' || !!window.__TAURI__;
 const API_KEY = IS_LOCAL ? '85134f05e0f15fe779e23cd56c1a08d5' : null;
 const BASE = IS_LOCAL ? 'https://api.themoviedb.org/3' : '';
 
