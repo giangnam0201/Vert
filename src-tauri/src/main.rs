@@ -37,14 +37,6 @@ fn main() {
         .decorations(false)
         .transparent(false)
         .initialization_script(init_script)
-        .on_navigation(|url| {
-            // Block top-level navigation to external http/https URLs (prevents redirect ads)
-            let scheme = url.scheme();
-            if scheme == "http" || scheme == "https" {
-                return false;
-            }
-            true
-        })
         .build()?;
 
         Ok(())
