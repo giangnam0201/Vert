@@ -1192,7 +1192,7 @@ function wireSettingsActions() {
         const dd = document.getElementById('account-dropdown');
         dd.classList.remove('open');
         document.getElementById('nav-avatar').classList.remove('open');
-        showToast('Vert v1.0.0 — Nền tảng xem phim miễn phí dùng TMDB và VidKing');
+        showToast('Vert v1.1.0 - Made by namdev and based on hnrie/Vert');
     };
 
     document.getElementById('settings-sync').onclick = e => {

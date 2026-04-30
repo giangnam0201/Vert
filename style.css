@@ -201,17 +201,15 @@ img {
 }
 
 .logo {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 900;
-    color: transparent;
-    background: linear-gradient(90deg, #ff3333, #E50914);
-    -webkit-background-clip: text;
-    background-clip: text;
-    letter-spacing: 3px;
+    color: #E50914;
+    letter-spacing: 4px;
     cursor: pointer;
     user-select: none;
-    transition: filter .3s, transform .3s;
-    filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.4));
+    transition: transform .3s, filter .3s;
+    font-family: 'Arial Black', Impact, sans-serif;
+    text-transform: uppercase;
 }
 
 .logo:hover {
