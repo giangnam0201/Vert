@@ -28,7 +28,9 @@
       "deb": {
         "depends": []
       },
-      "icon": [],
+      "icon": [
+        "icons/icon.ico"
+      ],
       "identifier": "com.vert.app",
       "longDescription": "",
       "macOS": {
