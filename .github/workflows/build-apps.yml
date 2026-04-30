@@ -52,13 +52,24 @@ jobs:
           cp -r index.html style.css script.js manifest.json api www/ 2>/dev/null || true
       - name: Add Android Platform
         run: npx cap add android
+      - name: Generate Android Icons
+        run: |
+          npm install -g @capacitor/assets
+          mkdir -p assets
+          cp src-tauri/icons/icon.png assets/icon.png
+          cp src-tauri/icons/icon.png assets/splash.png
+          npx capacitor-assets generate --android
       - name: Build Android APK
         run: |
           npx cap sync android
           cd android
           ./gradlew assembleDebug
+      - name: Rename APK
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/vert-v$VERSION.apk
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
           name: Vert-Android-App
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/vert-*.apk
