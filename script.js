@@ -2,7 +2,7 @@
 const IMG = 'https://image.tmdb.org/t/p';
 const VIDKING = 'https://www.vidking.net/embed';
 const VIDKING_ORIGIN = 'https://www.vidking.net';
-const VIDEASY = 'https://vidsrc.me/embed';
+const VIDEASY = 'https://player.videasy.net';
 let playerSource = localStorage.getItem('vk_player') || 'videasy';
 const DEFAULT_AUDIO_SETTINGS = { enabled: false, spatial: false, volume: 0.45, width: 0.6, depth: 0.45 };
 let audioSettings = (() => {
@@ -707,13 +707,13 @@ function playContent(item, season, episode) {
         if (isVidking) {
             url = `${VIDKING}/tv/${item.id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
         } else {
-            url = `https://vidlink.pro/tv/${item.id}/${s}/${e}?primaryColor=E50914&autoplay=false`;
+            url = `${VIDEASY}/tv/${item.id}/${s}/${e}?color=e50914&autoplayNextEpisode=true&nextEpisode=true&episodeSelector=true&overlay=true`;
         }
     } else {
         if (isVidking) {
             url = `${VIDKING}/movie/${item.id}?color=e50914&autoPlay=true`;
         } else {
-            url = `https://vidlink.pro/movie/${item.id}?primaryColor=E50914&autoplay=false`;
+            url = `${VIDEASY}/movie/${item.id}?color=e50914&overlay=true`;
         }
     }
 
@@ -1203,7 +1203,7 @@ function wireSettingsActions() {
     };
 
     const playerText = document.getElementById('player-source-text');
-    if (playerText) playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidSrc';
+    if (playerText) playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidEasy';
 
     const playerToggleBtn = document.getElementById('settings-toggle-player');
     if (playerToggleBtn) {
@@ -1211,8 +1211,8 @@ function wireSettingsActions() {
             e.stopPropagation();
             playerSource = playerSource === 'vidking' ? 'videasy' : 'vidking';
             localStorage.setItem('vk_player', playerSource);
-            playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidSrc';
-            showToast(`Đã chuyển trình phát sang ${playerSource === 'vidking' ? 'VidKing' : 'VidSrc'}`);
+            playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidEasy';
+            showToast(`Đã chuyển trình phát sang ${playerSource === 'vidking' ? 'VidKing' : 'VidEasy'}`);
         };
     }
 
