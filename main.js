@@ -16,6 +16,11 @@ function createWindow() {
         }
     });
 
+    // Block popups and ads opening new windows
+    win.webContents.setWindowOpenHandler(() => {
+        return { action: 'deny' };
+    });
+
     win.loadFile('index.html');
 
     ipcMain.on('window-minimize', () => win.minimize());

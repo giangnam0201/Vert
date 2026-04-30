@@ -2,7 +2,7 @@
 const IMG = 'https://image.tmdb.org/t/p';
 const VIDKING = 'https://www.vidking.net/embed';
 const VIDKING_ORIGIN = 'https://www.vidking.net';
-const VIDEASY = 'https://player.videasy.net';
+const VIDEASY = 'https://vidsrc.pro/embed';
 let playerSource = localStorage.getItem('vk_player') || 'videasy';
 const DEFAULT_AUDIO_SETTINGS = { enabled: false, spatial: false, volume: 0.45, width: 0.6, depth: 0.45 };
 let audioSettings = (() => {
@@ -723,7 +723,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
@@ -1203,7 +1203,7 @@ function wireSettingsActions() {
     };
 
     const playerText = document.getElementById('player-source-text');
-    if (playerText) playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidEasy';
+    if (playerText) playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidSrc';
 
     const playerToggleBtn = document.getElementById('settings-toggle-player');
     if (playerToggleBtn) {
@@ -1211,8 +1211,8 @@ function wireSettingsActions() {
             e.stopPropagation();
             playerSource = playerSource === 'vidking' ? 'videasy' : 'vidking';
             localStorage.setItem('vk_player', playerSource);
-            playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidEasy';
-            showToast(`Đã chuyển trình phát sang ${playerSource === 'vidking' ? 'VidKing' : 'VidEasy'}`);
+            playerText.textContent = playerSource === 'vidking' ? 'Trình phát: VidKing' : 'Trình phát: VidSrc';
+            showToast(`Đã chuyển trình phát sang ${playerSource === 'vidking' ? 'VidKing' : 'VidSrc'}`);
         };
     }
 
