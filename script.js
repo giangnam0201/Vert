@@ -2,7 +2,7 @@
 const IMG = 'https://image.tmdb.org/t/p';
 const VIDKING = 'https://www.vidking.net/embed';
 const VIDKING_ORIGIN = 'https://www.vidking.net';
-const VIDEASY = 'https://vidsrc.pro/embed';
+const VIDEASY = 'https://vidsrc.me/embed';
 let playerSource = localStorage.getItem('vk_player') || 'videasy';
 const DEFAULT_AUDIO_SETTINGS = { enabled: false, spatial: false, volume: 0.45, width: 0.6, depth: 0.45 };
 let audioSettings = (() => {
@@ -707,13 +707,13 @@ function playContent(item, season, episode) {
         if (isVidking) {
             url = `${VIDKING}/tv/${item.id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
         } else {
-            url = `${VIDEASY}/tv/${item.id}/${s}/${e}?color=e50914&autoplayNextEpisode=true&nextEpisode=true&episodeSelector=true`;
+            url = `${VIDEASY}/tv?tmdb=${item.id}&season=${s}&episode=${e}`;
         }
     } else {
         if (isVidking) {
             url = `${VIDKING}/movie/${item.id}?color=e50914&autoPlay=true`;
         } else {
-            url = `${VIDEASY}/movie/${item.id}?color=e50914`;
+            url = `${VIDEASY}/movie?tmdb=${item.id}`;
         }
     }
 
@@ -723,7 +723,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
