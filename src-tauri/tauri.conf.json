@@ -3,7 +3,7 @@
     "beforeDevCommand": "",
     "beforeBuildCommand": "",
     "devPath": "../",
-    "distDir": "../",
+    "distDir": "../www",
     "withGlobalTauri": true
   },
   "package": {
