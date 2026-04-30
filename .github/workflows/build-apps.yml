@@ -59,6 +59,27 @@ jobs:
           cp src-tauri/icons/icon.png assets/icon.png
           cp src-tauri/icons/icon.png assets/splash.png
           npx capacitor-assets generate --android
+      - name: Native Android Popup Blocker
+        run: |
+          cat << 'EOF' > android/app/src/main/java/com/vert/app/MainActivity.java
+          package com.vert.app;
+          import android.os.Bundle;
+          import android.webkit.WebView;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+              }
+              @Override
+              public void onStart() {
+                  super.onStart();
+                  WebView webView = this.bridge.getWebView();
+                  webView.getSettings().setSupportMultipleWindows(false);
+                  webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+              }
+          }
+          EOF
       - name: Build Android APK
         run: |
           npx cap sync android

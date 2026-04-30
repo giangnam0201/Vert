@@ -723,8 +723,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        const sandboxAttr = isVidking ? '' : `sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"`;
-        frame.innerHTML = `<iframe src="${url}" ${sandboxAttr} referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
