@@ -2,21 +2,9 @@
   "name": "vert",
   "version": "1.1.0",
   "description": "VERT: Phim khong gioi han",
-  "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "build:win": "electron-builder --win -p never",
+    "tauri": "tauri",
     "build:android": "cap sync android && cd android && gradlew assembleDebug"
-  },
-  "build": {
-    "appId": "com.vert.app",
-    "productName": "Vert",
-    "directories": {
-      "output": "dist"
-    },
-    "win": {
-      "target": ["nsis"]
-    }
   },
   "dependencies": {
     "@capacitor/android": "^5.0.0",
@@ -24,7 +12,6 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^5.0.0",
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
+    "@tauri-apps/cli": "^1.5.0"
   }
 }
