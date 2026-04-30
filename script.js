@@ -1470,16 +1470,18 @@ async function importSyncCode() {
 function hideLoader() { setTimeout(() => document.getElementById('loader-screen').classList.add('hidden'), 800); }
 
 
-// --- Electron Window Controls ---
-if (window.electronAPI) {
-    document.body.classList.add('is-electron');
+// --- Desktop Window Controls ---
+if (window.__TAURI__) {
+    document.body.classList.add('is-electron'); // Keep class name so CSS still works
+    const { appWindow } = window.__TAURI__.window;
+    
     document.getElementById('min-btn')?.addEventListener('click', () => {
-        window.electronAPI.minimize();
+        appWindow.minimize();
     });
     document.getElementById('max-btn')?.addEventListener('click', () => {
-        window.electronAPI.maximize();
+        appWindow.toggleMaximize();
     });
     document.getElementById('close-btn')?.addEventListener('click', () => {
-        window.electronAPI.close();
+        appWindow.close();
     });
 }
