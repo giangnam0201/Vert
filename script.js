@@ -11,9 +11,19 @@ let audioSettings = (() => {
 })();
 let audioEngine = null;
 
-const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'tauri.localhost' || location.protocol === 'file:' || !!window.__TAURI__;
-const API_KEY = IS_LOCAL ? '85134f05e0f15fe779e23cd56c1a08d5' : null;
-const BASE = IS_LOCAL ? 'https://api.themoviedb.org/3' : '';
+const IS_LOCAL = location.hostname === 'localhost' || 
+                 location.hostname === '127.0.0.1' || 
+                 location.hostname === 'tauri.localhost' || 
+                 location.protocol === 'file:' || 
+                 location.hostname.startsWith('192.168.') || 
+                 location.hostname.startsWith('10.') || 
+                 location.hostname.startsWith('172.') || 
+                 location.hostname.endsWith('.local') ||
+                 !!window.__TAURI__ || 
+                 !!window.Capacitor;
+
+const API_KEY = '85134f05e0f15fe779e23cd56c1a08d5';
+const BASE = 'https://api.themoviedb.org/3';
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -165,10 +175,17 @@ const CACHE_TTL = 30 * 60 * 1000;
 
 async function tmdb(ep, extra = {}) {
     let url;
-    if (IS_LOCAL) {
+    const forceDirect = !!window.__TAURI__ || !!window.Capacitor || IS_LOCAL;
+    
+    const getDirectUrl = () => {
         const sep = ep.includes('?') ? '&' : '?';
-        url = `${BASE}${ep}${sep}api_key=${API_KEY}&language=vi-VN`;
-        Object.entries(extra).forEach(([k, v]) => url += `&${k}=${encodeURIComponent(v)}`);
+        let u = `${BASE}${ep}${sep}api_key=${API_KEY}&language=vi-VN`;
+        Object.entries(extra).forEach(([k, v]) => u += `&${k}=${encodeURIComponent(v)}`);
+        return u;
+    };
+
+    if (forceDirect) {
+        url = getDirectUrl();
     } else {
         const params = new URLSearchParams({ ep, ...extra });
         url = `/api/tmdb?${params.toString()}`;
@@ -185,7 +202,15 @@ async function tmdb(ep, extra = {}) {
         } catch (_) { }
     }
 
-    const r = await fetch(url);
+    let r = await fetch(url);
+    
+    // Fallback if proxy fails or returns error
+    if (!r.ok && !forceDirect) {
+        console.warn(`TMDB Proxy failed (${r.status}), falling back to direct API`);
+        url = getDirectUrl();
+        r = await fetch(url);
+    }
+
     if (!r.ok) throw new Error(`TMDB ${r.status}`);
     const data = await r.json();
 
@@ -213,10 +238,15 @@ function norm(item, fallback) {
 
 async function loadGenres() {
     try {
-        const [m, t] = await Promise.all([tmdb('/genre/movie/list'), tmdb('/genre/tv/list')]);
+        const [m, t] = await Promise.all([
+            tmdb('/genre/movie/list').catch(() => ({ genres: [] })),
+            tmdb('/genre/tv/list').catch(() => ({ genres: [] }))
+        ]);
         [...(m.genres || []), ...(t.genres || [])].forEach(g => GENRE_MAP[g.id] = g.name);
         buildFilterMenu();
-    } catch (e) { }
+    } catch (e) {
+        console.error('Failed to load genres', e);
+    }
 }
 
 function buildFilterMenu() {
@@ -359,14 +389,19 @@ async function buildAllRows() {
     for (let i = 0; i < ROWS.length; i += BATCH_SIZE) {
         const batch = ROWS.slice(i, i + BATCH_SIZE);
         const tasks = batch.map(async cfg => {
-            let ep = cfg.endpoint;
-            if (ep.includes('/discover/')) {
-                const page = Math.floor(Math.random() * 3) + 1;
-                ep += `&page=${page}`;
+            try {
+                let ep = cfg.endpoint;
+                if (ep.includes('/discover/')) {
+                    const page = Math.floor(Math.random() * 3) + 1;
+                    ep += `&page=${page}`;
+                }
+                const data = await tmdb(ep);
+                if (cfg.id === 'trending') trendingData = data;
+                return { cfg, items: (data.results || []).map(r => norm(r, cfg.mediaType)).filter(Boolean) };
+            } catch (err) {
+                console.warn(`Failed to load row ${cfg.id}:`, err);
+                return { cfg, items: [] };
             }
-            const data = await tmdb(ep);
-            if (cfg.id === 'trending') trendingData = data;
-            return { cfg, items: (data.results || []).map(r => norm(r, cfg.mediaType)).filter(Boolean) };
         });
         const results = await Promise.allSettled(tasks);
         allResults.push(...results);
