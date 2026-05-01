@@ -83,7 +83,15 @@ function installAdHooks() {
         const blocked = isLikelyAdUrl(url) && target === '_blank';
         if (blocked) {
             showToast('Đã chặn cửa sổ quảng cáo nghi ngờ');
-            return null;
+            return {
+                closed: false,
+                focus: function() {},
+                blur: function() {},
+                close: function() { this.closed = true; },
+                postMessage: function() {},
+                location: { href: url || '' },
+                document: { write: function() {}, close: function() {} }
+            };
         }
         return nativeOpen.call(window, url, target, features);
     };

@@ -9,8 +9,18 @@ fn main() {
   tauri::Builder::default()
     .setup(|app| {
         let init_script = r#"
-            // Block window.open
-            window.open = function() { return null; };
+            // Block window.open but return a mock object to prevent video player crashes
+            window.open = function(url, target, features) { 
+                return {
+                    closed: false,
+                    close: function() { this.closed = true; },
+                    focus: function() {},
+                    blur: function() {},
+                    postMessage: function() {},
+                    location: { href: url || '' },
+                    document: { write: function() {}, close: function() {} }
+                }; 
+            };
             // Intercept clicks on links that try to open in a new tab/window
             document.addEventListener('click', function(e) {
                 var target = e.target;
