@@ -37,16 +37,8 @@ function saveAudioSettings() {
 }
 
 function createAudioEngine() {
-    if (audioEngine || typeof Howl === 'undefined') return;
-    audioEngine = {
-        move: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0e5f8c8.mp3?filename=click-124467.mp3'], volume: 0.2 }),
-        open: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/10/audio_e17e4f0f6f.mp3?filename=video-game-bonus-2064.mp3'], volume: 0.18 }),
-        close: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_96b478f3a0.mp3?filename=interface-124464.mp3'], volume: 0.18 }),
-        hum: new Howl({
-            src: ['https://cdn.pixabay.com/download/audio/2021/11/25/audio_5b5a53470b.mp3?filename=atmospheric-ambient-10618.mp3'],
-            loop: true, html5: true, volume: 0
-        })
-    };
+    // Disabled per user request to clean up console errors
+    return;
 }
 
 function updateAudioLabel() {
@@ -203,16 +195,28 @@ async function tmdb(ep, extra = {}) {
     }
 
     let r = await fetch(url);
-    
-    // Fallback if proxy fails or returns error
-    if (!r.ok && !forceDirect) {
-        console.warn(`TMDB Proxy failed (${r.status}), falling back to direct API`);
-        url = getDirectUrl();
-        r = await fetch(url);
-    }
+    let data;
 
-    if (!r.ok) throw new Error(`TMDB ${r.status}`);
-    const data = await r.json();
+    const tryParse = async (res) => {
+        const ct = res.headers.get('content-type');
+        if (ct && ct.includes('application/json')) return await res.json();
+        throw new Error('Not JSON');
+    };
+
+    try {
+        if (!r.ok) throw new Error('Not OK');
+        data = await tryParse(r);
+    } catch (err) {
+        if (!forceDirect) {
+            console.warn(`TMDB Proxy failed or returned non-JSON, falling back to direct API`);
+            url = getDirectUrl();
+            r = await fetch(url);
+            if (!r.ok) throw new Error(`TMDB Direct ${r.status}`);
+            data = await r.json();
+        } else {
+            throw err;
+        }
+    }
 
     if (!Object.keys(extra).includes('query')) {
         try { sessionStorage.setItem(cacheKey, JSON.stringify({ data, ts: Date.now() })); } catch (_) { }
