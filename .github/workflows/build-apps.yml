@@ -67,7 +67,10 @@ jobs:
           import android.net.Uri;
           import android.os.Bundle;
           import android.webkit.WebView;
+          import android.os.Message;
+          import android.webkit.CookieManager;
           import com.getcapacitor.BridgeActivity;
+          import com.getcapacitor.BridgeWebChromeClient;
           public class MainActivity extends BridgeActivity {
               @Override
               public void onCreate(Bundle savedInstanceState) {
@@ -77,8 +80,27 @@ jobs:
               public void onStart() {
                   super.onStart();
                   WebView webView = this.bridge.getWebView();
-                  webView.getSettings().setSupportMultipleWindows(false);
-                  webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+                  webView.getSettings().setSupportMultipleWindows(true);
+                  webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                  webView.getSettings().setDomStorageEnabled(true);
+                  
+                  CookieManager cookieManager = CookieManager.getInstance();
+                  cookieManager.setAcceptCookie(true);
+                  cookieManager.setAcceptThirdPartyCookies(webView, true);
+
+                  String ua = webView.getSettings().getUserAgentString();
+                  webView.getSettings().setUserAgentString(ua.replace("; wv", ""));
+
+                  webView.setWebChromeClient(new BridgeWebChromeClient(this.bridge) {
+                      @Override
+                      public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                          WebView dummyWebView = new WebView(view.getContext());
+                          WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                          transport.setWebView(dummyWebView);
+                          resultMsg.sendToTarget();
+                          return true;
+                      }
+                  });
               }
               @Override
               public void startActivity(Intent intent) {
