@@ -1,0 +1,64 @@
+{
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devPath": "../",
+    "distDir": "../www",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "Vert",
+    "version": "1.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "window": {
+        "all": false,
+        "close": true,
+        "minimize": true,
+        "maximize": true,
+        "unmaximize": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "Entertainment",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.png",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.vert.app",
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "security": {
+      "csp": "default-src 'self' tauri: asset: http://localhost:*; connect-src 'self' tauri: asset: http://localhost:* https:; script-src 'self' tauri: asset: http://localhost:* 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' tauri: asset: http://localhost:* 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' tauri: asset: http://localhost:* https://fonts.gstatic.com; img-src 'self' tauri: asset: http://localhost:* data: blob: https:; media-src 'self' tauri: asset: http://localhost:* blob: https:; frame-src 'self' tauri: asset: http://localhost:* https:;"
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": []
+  }
+}

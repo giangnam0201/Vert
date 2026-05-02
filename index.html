@@ -33,6 +33,20 @@
 </head>
 
 <body>
+    <div id="electron-titlebar">
+        <div class="drag-region"></div>
+        <div class="window-controls">
+            <button id="min-btn" aria-label="Minimize">
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M 0,5 L 10,5" stroke="currentColor" stroke-width="1"/></svg>
+            </button>
+            <button id="max-btn" aria-label="Maximize">
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M 0,0 L 10,0 L 10,10 L 0,10 Z" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+            </button>
+            <button id="close-btn" aria-label="Close">
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M 0,0 L 10,10 M 10,0 L 0,10" stroke="currentColor" stroke-width="1"/></svg>
+            </button>
+        </div>
+    </div>
 
     <nav id="navbar">
         <div class="nav-left">
@@ -162,7 +176,7 @@
                         </svg>
                         <span>Về Vert</span>
                     </button>
-                    <div class="account-version">v1.0.0 · Dữ liệu từ TMDB</div>
+                    <div class="account-version">v1.1.0 · Dữ liệu từ TMDB</div>
                 </div>
             </div>
         </div>

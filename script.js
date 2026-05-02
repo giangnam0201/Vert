@@ -11,9 +11,19 @@ let audioSettings = (() => {
 })();
 let audioEngine = null;
 
-const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
-const API_KEY = IS_LOCAL ? '85134f05e0f15fe779e23cd56c1a08d5' : null;
-const BASE = IS_LOCAL ? 'https://api.themoviedb.org/3' : '';
+const IS_LOCAL = location.hostname === 'localhost' || 
+                 location.hostname === '127.0.0.1' || 
+                 location.hostname === 'tauri.localhost' || 
+                 location.protocol === 'file:' || 
+                 location.hostname.startsWith('192.168.') || 
+                 location.hostname.startsWith('10.') || 
+                 location.hostname.startsWith('172.') || 
+                 location.hostname.endsWith('.local') ||
+                 !!window.__TAURI__ || 
+                 !!window.Capacitor;
+
+const API_KEY = '85134f05e0f15fe779e23cd56c1a08d5';
+const BASE = 'https://api.themoviedb.org/3';
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -27,16 +37,8 @@ function saveAudioSettings() {
 }
 
 function createAudioEngine() {
-    if (audioEngine || typeof Howl === 'undefined') return;
-    audioEngine = {
-        move: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0e5f8c8.mp3?filename=click-124467.mp3'], volume: 0.2 }),
-        open: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/10/audio_e17e4f0f6f.mp3?filename=video-game-bonus-2064.mp3'], volume: 0.18 }),
-        close: new Howl({ src: ['https://cdn.pixabay.com/download/audio/2022/03/15/audio_96b478f3a0.mp3?filename=interface-124464.mp3'], volume: 0.18 }),
-        hum: new Howl({
-            src: ['https://cdn.pixabay.com/download/audio/2021/11/25/audio_5b5a53470b.mp3?filename=atmospheric-ambient-10618.mp3'],
-            loop: true, html5: true, volume: 0
-        })
-    };
+    // Disabled per user request to clean up console errors
+    return;
 }
 
 function updateAudioLabel() {
@@ -83,7 +85,15 @@ function installAdHooks() {
         const blocked = isLikelyAdUrl(url) && target === '_blank';
         if (blocked) {
             showToast('Đã chặn cửa sổ quảng cáo nghi ngờ');
-            return null;
+            return {
+                closed: false,
+                focus: function() {},
+                blur: function() {},
+                close: function() { this.closed = true; },
+                postMessage: function() {},
+                location: { href: url || '' },
+                document: { write: function() {}, close: function() {} }
+            };
         }
         return nativeOpen.call(window, url, target, features);
     };
@@ -157,10 +167,17 @@ const CACHE_TTL = 30 * 60 * 1000;
 
 async function tmdb(ep, extra = {}) {
     let url;
-    if (IS_LOCAL) {
+    const forceDirect = !!window.__TAURI__ || !!window.Capacitor || IS_LOCAL;
+    
+    const getDirectUrl = () => {
         const sep = ep.includes('?') ? '&' : '?';
-        url = `${BASE}${ep}${sep}api_key=${API_KEY}&language=vi-VN`;
-        Object.entries(extra).forEach(([k, v]) => url += `&${k}=${encodeURIComponent(v)}`);
+        let u = `${BASE}${ep}${sep}api_key=${API_KEY}&language=vi-VN`;
+        Object.entries(extra).forEach(([k, v]) => u += `&${k}=${encodeURIComponent(v)}`);
+        return u;
+    };
+
+    if (forceDirect) {
+        url = getDirectUrl();
     } else {
         const params = new URLSearchParams({ ep, ...extra });
         url = `/api/tmdb?${params.toString()}`;
@@ -177,9 +194,29 @@ async function tmdb(ep, extra = {}) {
         } catch (_) { }
     }
 
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`TMDB ${r.status}`);
-    const data = await r.json();
+    let r = await fetch(url);
+    let data;
+
+    const tryParse = async (res) => {
+        const ct = res.headers.get('content-type');
+        if (ct && ct.includes('application/json')) return await res.json();
+        throw new Error('Not JSON');
+    };
+
+    try {
+        if (!r.ok) throw new Error('Not OK');
+        data = await tryParse(r);
+    } catch (err) {
+        if (!forceDirect) {
+            console.warn(`TMDB Proxy failed or returned non-JSON, falling back to direct API`);
+            url = getDirectUrl();
+            r = await fetch(url);
+            if (!r.ok) throw new Error(`TMDB Direct ${r.status}`);
+            data = await r.json();
+        } else {
+            throw err;
+        }
+    }
 
     if (!Object.keys(extra).includes('query')) {
         try { sessionStorage.setItem(cacheKey, JSON.stringify({ data, ts: Date.now() })); } catch (_) { }
@@ -205,10 +242,15 @@ function norm(item, fallback) {
 
 async function loadGenres() {
     try {
-        const [m, t] = await Promise.all([tmdb('/genre/movie/list'), tmdb('/genre/tv/list')]);
+        const [m, t] = await Promise.all([
+            tmdb('/genre/movie/list').catch(() => ({ genres: [] })),
+            tmdb('/genre/tv/list').catch(() => ({ genres: [] }))
+        ]);
         [...(m.genres || []), ...(t.genres || [])].forEach(g => GENRE_MAP[g.id] = g.name);
         buildFilterMenu();
-    } catch (e) { }
+    } catch (e) {
+        console.error('Failed to load genres', e);
+    }
 }
 
 function buildFilterMenu() {
@@ -351,14 +393,19 @@ async function buildAllRows() {
     for (let i = 0; i < ROWS.length; i += BATCH_SIZE) {
         const batch = ROWS.slice(i, i + BATCH_SIZE);
         const tasks = batch.map(async cfg => {
-            let ep = cfg.endpoint;
-            if (ep.includes('/discover/')) {
-                const page = Math.floor(Math.random() * 3) + 1;
-                ep += `&page=${page}`;
+            try {
+                let ep = cfg.endpoint;
+                if (ep.includes('/discover/')) {
+                    const page = Math.floor(Math.random() * 3) + 1;
+                    ep += `&page=${page}`;
+                }
+                const data = await tmdb(ep);
+                if (cfg.id === 'trending') trendingData = data;
+                return { cfg, items: (data.results || []).map(r => norm(r, cfg.mediaType)).filter(Boolean) };
+            } catch (err) {
+                console.warn(`Failed to load row ${cfg.id}:`, err);
+                return { cfg, items: [] };
             }
-            const data = await tmdb(ep);
-            if (cfg.id === 'trending') trendingData = data;
-            return { cfg, items: (data.results || []).map(r => norm(r, cfg.mediaType)).filter(Boolean) };
         });
         const results = await Promise.allSettled(tasks);
         allResults.push(...results);
@@ -707,13 +754,13 @@ function playContent(item, season, episode) {
         if (isVidking) {
             url = `${VIDKING}/tv/${item.id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
         } else {
-            url = `${VIDEASY}/tv/${item.id}/${s}/${e}?color=e50914&autoplayNextEpisode=true&nextEpisode=true&episodeSelector=true`;
+            url = `${VIDEASY}/tv/${item.id}/${s}/${e}?color=e50914&autoplayNextEpisode=true&nextEpisode=true&episodeSelector=true&overlay=true`;
         }
     } else {
         if (isVidking) {
             url = `${VIDKING}/movie/${item.id}?color=e50914&autoPlay=true`;
         } else {
-            url = `${VIDEASY}/movie/${item.id}?color=e50914`;
+            url = `${VIDEASY}/movie/${item.id}?color=e50914&overlay=true`;
         }
     }
 
@@ -723,7 +770,7 @@ function playContent(item, season, episode) {
 
     setTimeout(() => {
         const frame = document.getElementById('player-frame');
-        frame.innerHTML = `<iframe src="${url}" referrerpolicy="origin" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
+        frame.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay;fullscreen;encrypted-media;picture-in-picture"></iframe>`;
     }, 150);
 
     const playerOverlay = document.getElementById('player-overlay');
@@ -1192,7 +1239,7 @@ function wireSettingsActions() {
         const dd = document.getElementById('account-dropdown');
         dd.classList.remove('open');
         document.getElementById('nav-avatar').classList.remove('open');
-        showToast('Vert v1.0.0 — Nền tảng xem phim miễn phí dùng TMDB và VidKing');
+        showToast('Vert v1.1.0 - Made by namdev and based on hnrie/Vert');
     };
 
     document.getElementById('settings-sync').onclick = e => {
@@ -1468,3 +1515,20 @@ async function importSyncCode() {
 })();
 
 function hideLoader() { setTimeout(() => document.getElementById('loader-screen').classList.add('hidden'), 800); }
+
+
+// --- Desktop Window Controls ---
+if (window.__TAURI__) {
+    document.body.classList.add('is-electron'); // Keep class name so CSS still works
+    const { appWindow } = window.__TAURI__.window;
+    
+    document.getElementById('min-btn')?.addEventListener('click', () => {
+        appWindow.minimize();
+    });
+    document.getElementById('max-btn')?.addEventListener('click', () => {
+        appWindow.toggleMaximize();
+    });
+    document.getElementById('close-btn')?.addEventListener('click', () => {
+        appWindow.close();
+    });
+}
